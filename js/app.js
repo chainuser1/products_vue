@@ -1,4 +1,4 @@
-new Vue({
+var c = new Vue({
     el: '#app',
     data: {
         products: [
@@ -182,6 +182,71 @@ new Vue({
               "category":"Electronics",
               "price":"375.00"
            }
-        ]
+        ],
+
+        order:{
+            dir:1,
+            column:'price'
+        },
+
+        filter:{
+           name:''
+        }
+        
+   },
+   computed:{
+      sortProducts(){
+         return this.filteredProducts.sort((a,b) => 
+            {
+               let left =  a[this.order.column],
+                   right = b[this.order.column]
+
+               if(isNaN(left) && isNaN(right)){
+                  if(left>right)
+                     return 1 * this.order.dir;
+                  else if(left<right)
+                     return -1 * this.order.dir;
+                  else
+                     return 0;
+               }
+               else
+                  return left-right * this.order.dir;
+            }
+            
+         ); 
+           
+      },
+     
+      sortType(){
+         return this.order.dir === 1 ?'ascending':'descending'
+      },
+
+      filteredProducts(){
+         let products = this.products
+         if(this.filter.name.length > 0){
+            let regxp = new RegExp(this.filter.name,'i')
+            products =  products.filter(e =>
+                e.name.match(regxp))
+   
+         }
+         return products
+      }
+
+   },
+
+   methods:{ 
+      classes(col){
+         //return ['sort-control','ascending'];
+         return ['sort-control',
+            this.order.column === col ?this.sortType:''
+         ]
+      },
+      sort(col){
+         this.order.column = col
+         this.order.dir *=-1
+      },
+      clearText(){
+         this.filter.name = ''
+      }
    }
 })
