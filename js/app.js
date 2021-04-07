@@ -191,10 +191,36 @@ var c = new Vue({
 
         filter:{
            name:''
-        }
-        
+        },
+
+        product:{
+           id:0,
+           name:'',
+           category:'',
+           price:0
+        },
+
+        currentPage:1,
+        perPage:5,
+       
    },
    computed:{
+      pages(){
+         return Math.ceil(this.products.length/this.perPage)
+      },
+      isFirstPage(){
+         return this.currentPage === 1;
+      },
+      isLastPage(){
+         return this.currentPage === this.pages;
+      },
+      paginateProducts(){
+        let start = (this.currentPage - 1) * this.perPage
+        ,end = this.currentPage * this.perPage
+
+        return this.sortProducts.slice(start, end)
+      },
+
       sortProducts(){
          return this.filteredProducts.sort((a,b) => 
             {
@@ -210,7 +236,7 @@ var c = new Vue({
                      return 0;
                }
                else
-                  return left-right * this.order.dir;
+                  return (left-right) * this.order.dir;
             }
             
          ); 
@@ -235,6 +261,17 @@ var c = new Vue({
    },
 
    methods:{ 
+      prev(){
+         if(!this.isFirstPage){
+            this.currentPage--;
+         }
+      },
+      next(){
+         if(!this.isLastPage){
+            this.currentPage++;
+         }
+      },
+
       classes(col){
          //return ['sort-control','ascending'];
          return ['sort-control',
@@ -247,6 +284,19 @@ var c = new Vue({
       },
       clearText(){
          this.filter.name = ''
+      },
+
+      saveProduct(){
+         this.product.id= this.products.length+1
+         if(this.product.name && this.product.category && !isNaN(this.product.price)){
+            this.product.price = Number(this.product.price).toFixed(2)
+            this.products.unshift(this.product)
+            $('#exampleModalCenter').modal('hide')
+         }
+         else{
+            alert("Please fill out the form completely")
+         }
+
       }
    }
 })
